@@ -1,0 +1,86 @@
+// Classe base para conta bancária
+public class ContaBancaria {
+    protected double saldo;
+
+    public ContaBancaria(double saldo) {
+        this.saldo = saldo;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public void sacar(double valor) {
+        if (saldo >= valor) {
+            saldo -= valor;
+            System.out.println("Saque de " + valor + " realizado com sucesso.");
+        } else {
+            System.out.println("Saldo insuficiente para realizar o saque de " + valor + ".");
+        }
+    }
+}
+
+// Conta corrente
+public class ContaCorrente extends ContaBancaria {
+    public ContaCorrente(double saldo) {
+        super(saldo);
+    }
+}
+
+// Conta poupança
+public class ContaPoupanca extends ContaBancaria {
+    public ContaPoupanca(double saldo) {
+        super(saldo);
+    }
+}
+
+// Conta investimento
+public class ContaInvestimento extends ContaBancaria {
+    public ContaInvestimento(double saldo) {
+        super(saldo);
+    }
+}
+
+// Conta salário
+public class ContaSalario extends ContaBancaria {
+    public ContaSalario(double saldo) {
+        super(saldo);
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        // Criando contas
+        ContaCorrente cc = new ContaCorrente(1000);
+        ContaPoupanca cp = new ContaPoupanca(500);
+        ContaInvestimento ci = new ContaInvestimento(2000);
+        ContaSalario cs = new ContaSalario(1500);
+
+        // Realizando saques
+        cc.sacar(200);
+        cp.sacar(700);
+        ci.sacar(2500); // Tentativa de saque com valor superior ao saldo
+        cs.sacar(1000);
+    }
+}
+public aspect VerificarSaldoAspect {
+    pointcut saqueOperacao(double valor): 
+        execution(void ContaBancaria.sacar(double)) && args(valor);
+
+    before(double valor): saqueOperacao(valor) {
+        if (!verificarSaldo(valor)) {
+            System.out.println("Saldo insuficiente para realizar o saque de " + valor + ".");
+        }
+    }
+
+    private boolean verificarSaldo(double valor) {
+        ContaBancaria[] contas = {new ContaCorrente(1000), new ContaPoupanca(500), 
+                                  new ContaInvestimento(2000), new ContaSalario(1500)};
+        
+        double saldoTotal = 0;
+        for (ContaBancaria conta : contas) {
+            saldoTotal += conta.getSaldo();
+        }
+        
+        return saldoTotal >= valor;
+    }
+}
